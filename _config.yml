@@ -4,7 +4,7 @@
 # baseurl is the website's URL without the hostname
 
 # If you are building a simple GitHub user page (http://username.github.io) then use these settings:
-url: "http://username.github.io"
+url: "http://phillyai.github.io"
 baseurl: ""
 
 # If you are building a GitHub project page then use these settings:
@@ -14,10 +14,10 @@ baseurl: ""
 # Of course don't forget to change the username and projectname to YOUR username and project
 
 # Name of website
-title: My website
+title: 저장용 블로그
 
 # Short description of your site
-description: A virtual proof that name is awesome!
+description: 난 너무 대단해~~
 
 # --- Navigation bar options --- #
 
@@ -43,21 +43,21 @@ avatar: "/img/avatar-icon.png"
 # Change all these values or delete the ones you don't want.
 # Important: you must keep the "name" parameter, everything else you can remove
 author:
-  name: Some Person
-  email: "youremail@domain.com"
-  facebook: yourname  # eg. daattali
-  github: yourname    # eg. daattali
-  twitter: yourname   # eg. daattali
-  reddit: yourname    # eg. daattali
-  google-plus: +yourname   # eg. +DeanAttali or 109424658772469020925
-  linkedin: yourname  # eg. daattali
-  xing: yourname      # eg. daattali
-  stackoverflow: yourlink  # eg. "3943160/daattali"
-  snapchat: yourname  # eg. daattali
-  instagram: yourname # eg. daattali
-  youtube: yourlink   # eg. user/daattali or channel/daattali
-  spotify: yourname   # eg. daattali
-  telephone: yourphone   # eg. +14159998888
+  name: adnim
+  email: "sonagi.philly@gmail.com"
+  facebook:   # eg. daattali
+  github: phillyai    # eg. daattali
+  twitter: adnimpub   # eg. daattali
+  reddit:     # eg. daattali
+  google-plus:    # eg. +DeanAttali or 109424658772469020925
+  linkedin:   # eg. daattali
+  xing:       # eg. daattali
+  stackoverflow:   # eg. "3943160/daattali"
+  snapchat:   # eg. daattali
+  instagram:  # eg. daattali
+  youtube:    # eg. user/daattali or channel/daattali
+  spotify:    # eg. daattali
+  telephone:    # eg. +14159998888
 
 # Select which links to show in the footer
 footer-links-active:
@@ -80,13 +80,13 @@ footer-links-active:
 # Select which share links to show in posts
 share-links-active:
   twitter: true
-  facebook: true
+  facebook: false
   google: false
-  linkedin: true
+  linkedin: false
 
 # How to display the link to the website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "MyWebsite.com"  # eg. "deanattali.com/beautiful-jekyll"
+url-pretty: "phillyai.github.io"  # eg. "deanattali.com/beautiful-jekyll"
 
 # --- Misc --- #
 # Fill in your Disqus shortname (NOT the userid) if you want to support Disqus comments
