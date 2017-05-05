@@ -1,16 +1,9 @@
 ---
 layout: page
 title: About me
-subtitle: Why you'd want to go on a date with me
+subtitle: 볼거없는사람
 ---
 
-My name is Inigo Montoya. I have the following qualities:
+고등학생 개발자 아드라고 합니다. 노래, 게임도 좋아합니다.
 
-- I rock a great mustache
-- I'm extremely loyal to my family
-
-What else do you need?
-
-### my history
-
-To be honest, I'm having some trouble remembering right now, so why don't you just watch [my movie](http://en.wikipedia.org/wiki/The_Princess_Bride_%28film%29) and it will answer **all** your questions.
+언제나 생각 없이 아무도 봐주질 않는 [쓰레기](https://github.com/phillyai)를 만듭니다.
