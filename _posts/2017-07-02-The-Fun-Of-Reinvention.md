@@ -562,5 +562,32 @@ AssertionError: Must be > 0
 
 # 3. 메타클래스
 
+다음과 같이 클래스를 선언할 때, 실제로 파이썬은 어떻게 작동할까?
+
+```python
+class Player(Base):
+```
+
+는 다음과 같다.
+
+```python
+type.__prepare__('Player', (Base,))
+```
+
+`Contract` 클래스를 상속하는 모든 클래스들을 가져오려면 어떻게 해야 할까?
+
+```python
+_contracts = { }
+
+class Contract:
+    @classmethod
+    def __init_subclass__(cls):
+        _contracts[cls.__name__] = cls
+```
+
+```
+>>> _contracts
+{'Typed': <class 'Typed'>, 'Integer': <class 'Integer'>, 'Float': <class 'Float'>, 'String': <class 'String'>, 'Positive': <class 'Positive'>, 'PositiveInteger': <class 'PositiveInteger'>, 'NonEmpty': <class 'NonEmpty'>, 'NonEmptyString': <class 'NonEmptyString'>}
+```
 
 > To Be Continued.. 저는 기숙사 취침 시간 땜시렁,,ㅎㅎ
