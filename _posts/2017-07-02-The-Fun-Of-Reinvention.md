@@ -49,4 +49,93 @@ def gcd(a, b):
 
 이 코드를 좀 더 파이썬3.6 스럽게 하기 위해, 타입 검증을 위한 프레임워크를 만들어볼 것이다.
 
-> To Be Continued..
+```python
+class Contract:
+    @classmethod
+    def check(cls, value):
+        pass
+
+class Integer(Contract):
+    @classmethod
+    def check(cls, value):
+        assert isinstance(value, int), 'Expected int'
+```
+
+```
+>>> Integer.check(1)
+>>> Integer.check(1.5)
+AssertionError: Expected int
+```
+
+Integer 말고도 Float, String 등의 클래스들을 만들어 간단하게 타입 검증을 할 수 있을 것이다. 하지만 단순히 반복되는 코드에 불편함을 느낀다. 
+
+```python
+class Contract:
+    @classmethod
+    def check(cls, value):
+        pass
+
+class Typed(Contract):
+    @classmethod
+    def check(cls, value):
+        assert isinstance(value, cls.type), f'Expected {cls.type}'
+        super().check(value)
+
+class Integer(Typed):
+    type = int
+
+class Float(Typed):
+    type = float
+
+class String(Typed):
+    type = str
+```
+
+한결 간단해졌다!
+여기서 나오는 `f'a = {a}'` 은 [PEP 498의 F-String](https://www.python.org/dev/peps/pep-0498/) 이라는 문법이다.
+
+여기서 멈추지 않고 다른 검증 클래스도 만들어보자. 함수 gcd에서 a와 b는 자연수여야 하므로 0보다 커야한다.
+
+```python
+class Positive(Contract):
+    @classmethod
+    def check(cls, value):
+        assert value > 0, 'Must be > 0'
+        super().check(value)
+```
+
+그렇다면 이 검증 클래스들을 사용하여 gcd 함수를 다시 작성해보자.
+
+```python
+def gcd(a, b):
+    Integer.check(a)
+    Positive.check(a)
+    Integer.check(b)
+    Positive.check(b)
+
+    while b:
+        a, b = b, a % b
+    return a
+```
+
+```
+>>> gcd(27, 36)
+9
+>>> gcd("wow", "such")
+AssertionError: Expected <class 'int'>
+>>> gcd(-1, 1)
+AssertionError: Must be > 0
+```
+
+양수의 정수임을 확인하는 PositiveInteger 클래스를 만들자.
+
+```python
+class PositiveInteger(Integer, Positive):
+    pass
+```
+
+`PositiveInteger.check` 는 먼저 `Typed.check` 를 호출한다. 그리고 거기서 `super().check` 를 호출하는데, 이게 `Positive.check` 를 호출하게 된다. 결론적으로 작동이 잘 된다! 이해가 잘 되지 않는 사람들은 [여기를](https://stackoverflow.com/questions/3277367/how-does-pythons-super-work-with-multiple-inheritance) 참고하자.
+
+여기까지의 진행 상황을 [gist에](https://gist.github.com/phillyai/e98aaa4a0d04eb49e9a607e6890e1c0e) 올려두었다. 볼 사람은 보던가!
+
+> To Be Continued.. 저는 기숙사 취침 시간 땜시렁,,ㅎㅎ
