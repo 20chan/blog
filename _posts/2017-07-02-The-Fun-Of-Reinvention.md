@@ -562,6 +562,7 @@ AssertionError: Must be > 0
 
 # 3. 메타클래스
 
+다음은 메타클래스에 관한 설명이다. 하지만 내 설명이 파이썬의 ㅍ도 모르는 사람들에게도 바로 팍팍 꽂히는 설명이 아니기 때문에 [파이썬 문서](https://docs.python.org/3/reference/datamodel.html#metaclasses)를 참고하자.
 다음과 같이 클래스를 선언할 때, 실제로 파이썬은 어떻게 작동할까?
 
 ```python
@@ -574,7 +575,154 @@ class Player(Base):
 type.__prepare__('Player', (Base,))
 ```
 
-`Contract` 클래스를 상속하는 모든 클래스들을 가져오려면 어떻게 해야 할까?
+여기서 `__prepare__`는 클래스의 어트리뷰트와 메서드들을 키와 밸류로 가지는 딕셔너리를 리턴한다.
+간단하게 이를 확인하는 예제 코드를 짜보자.
+
+```python
+from collections import OrderedDict
+dic = {}
+
+
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, *args):
+        global dic
+        dic = OrderedDict()
+        return dic
+
+class Base(metaclass=Meta):
+    a = 'wow'
+    def __init__(self):
+        self.name = '아드'
+        self.x = 0
+        self.y = 42
+
+print(dic)
+```
+
+실행 결과는 다음과 같다.
+
+```python
+OrderedDict([('__module__', '__main__'), ('__qualname__', 'Base'), ('a', 'wow'), ('__init__', <function Base.__init__ at 0x011C51E0>)])
+```
+
+그러면 이를 반대로 이용해서, `__prepare__`에서 이미 값을 넣어준다면 클래스에서 선언하지 않은 오브젝트를 사용할 수 있지 않을까?
+
+```python
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, *args):
+        def see_me():
+            return '내가 보이니..?'
+        return {'see_me': see_me}
+
+class Base(metaclass=Meta):
+    a = see_me()
+
+print(Base.a)
+```
+
+```
+내가 보이니..?
+```
+
+클래스 `Base`에서, 스코프때문에 알 수 없는 함수 `see_me`를 호출했지만 런타임 에러 없이 잘 출력되는 것을 볼 수 있다! 
+
+사실 이건 비밀인데, 메타클래스가 클래스를 선언하기 전에 `__prepare__`를 호출한다면, 클래스를 선언한 뒤에는 `__new__`를 호출한다. 정확히 말하면, `Base = type.__new__(..)`를 호출한다. 
+`__new__(meta, name, bases, methods)` 는 `meta`에 메타클래스 자신의 클래스가, `name`에는 생성된 클래스의 이름이, `bases`는 생성된 클래스의 슈퍼 클래스들이 튜플로, `methods`에는 `__prepare__`에서 리턴했고, 클래스의 선언중 값이 채워졌던 딕셔너리 값이 들어가진다.
+
+```python
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, *args):
+        return {}
+
+    def __new__(meta, name, bases, methods):
+        print(f'name : "{name}", methods: {methods}')
+        return super().__new__(meta, name, bases, methods)
+
+class Base(metaclass=Meta):
+    pass
+```
+
+```python
+name : "Base", methods: {'__module__': '__main__', '__qualname__': 'Base'}
+```
+
+이렇게 메타클래스를 이용해 클래스에 어트리뷰트를 추가하는 것을 알아보았다. 하지만 지금까지 우리가 한대로라면, 이전의 `내가 보이니..?`를 출력하는 코드에는 문제점이 있다.
+
+```python
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, *args):
+        def see_me():
+            return '내가 보이니..?'
+        return {'see_me': see_me}
+
+    def __new__(meta, name, bases, methods):
+        return super().__new__(meta, name, bases, methods)
+
+
+class Base(metaclass=Meta):
+    pass
+
+print(Base.see_me())
+```
+
+```
+내가 보이니.?
+```
+
+바로 원하지 않았던 클래스 외부에서 어트리뷰트로 `see_me`에 접근할 수 있다는 것이다. 내가 원하는 것은 클래스 내부에서만 사용하는 것이었는데! 다양한 해결 방법이 있겠지만 우리는 `collections.ChainMap`이라는 콜렉션을 사용해 이 문제를 해결해보자.
+
+```python
+from collections import ChainMap
+
+dic = None
+
+class Meta(type):
+    @classmethod
+    def __prepare__(cls, *args):
+        def see_me():
+            return '내가 보이니..?'
+        global dic
+        dic = ChainMap({}, {'see_me': see_me})
+        return dic
+
+    def __new__(meta, name, bases, methods):
+        methods = methods.maps[0]
+        return super().__new__(meta, name, bases, methods)
+
+class Base(metaclass=Meta):
+    a = see_me()
+
+print(Base.a)
+print('see_me' in Base.__dict__.keys())
+```
+
+```
+내가 보이니..?
+False
+```
+
+`ChainMap`은 여러개의 맵들을 가지는 콜렉션이다. 예제 코드를 보면 쉽게 이해가 갈 것이다.
+
+```python
+>>> c = ChainMap({}, {'x': 0, 'y': 0})
+>>> c['x']
+0
+>>> c['a'] = 42
+>>> c
+ChainMap({'a': 42}, {'x': 0, 'y': 0})
+>>> c.maps[0]
+{'a': 42}
+>>> c['y']
+0
+```
+
+그렇다면 이제 본론으로 돌아가자. 우리는 `Player` 클래스의 어트리뷰트와 어노테이션을 이용하여 생성자를 숨기는 작업을 했다. 이 때 어노테이션에 쓰이는 검사 클래스들, `Contract`를 상속하는 클래스들을 직접 import시켜줬어야 했다. 지금까지 살펴본 메타클래스를 사용하여 이 문제를 해결할 방법이 쉽게 떠올르지 않는다면 이 글을 다시 읽어보도록 하자.
+
+먼저 `Contract`를 상속하는 클래스들을 가져와야 한다. 이는 `Contract.__init_subclass__`를 오버라이드하여 쉽게 해결할 수 있다.
 
 ```python
 _contracts = { }
@@ -590,4 +738,92 @@ class Contract:
 {'Typed': <class 'Typed'>, 'Integer': <class 'Integer'>, 'Float': <class 'Float'>, 'String': <class 'String'>, 'Positive': <class 'Positive'>, 'PositiveInteger': <class 'PositiveInteger'>, 'NonEmpty': <class 'NonEmpty'>, 'NonEmptyString': <class 'NonEmptyString'>}
 ```
 
-> To Be Continued.. 저는 기숙사 취침 시간 땜시렁,,ㅎㅎ
+그다음은 `Base`클래스의 메타클래스가 될 `BaseMeta`클래스를 만들어주고 지금까지 했던 작업을 해주자.
+
+```python
+class BaseMeta(type):
+    @classmethod
+    def __prepare__(cls, *args):
+        return ChainMap({}, _contracts)
+
+    def __new__(meta, name, bases, methods):
+        methods = methods.maps[0]
+        return super().__new__(meta, name, bases, methods)
+
+class Base(metaclass=BaseMeata):
+    ...
+```
+
+그렇다면 끝난 것이다! 새로운 파이썬 파일을 만들고, 이 모듈에서 `Base` 클래스만을 임포트해주고, 잘 작동하는지 확인해보자.
+
+```python
+from contract import Base
+
+class Player(Base):
+    name: NonEmptyString
+    x: Integer
+    y: Integer
+
+    def left(self, dx: PositiveInteger):
+        self.x -= dx
+
+    def right(self, dx: PositiveInteger):
+        self.x += dx
+
+p = Player('아드', 0, 0)
+p.left(-1)
+```
+
+```
+AssertionError: Must be > 0
+```
+
+억지스럽지만 마지막으로 하나만 더 해보자. `left`, `right` 메서드는 `PositiveInteger` 조건을 가지는 같은 이름을 가진 `dx` 라는 매개변수를 받는다. 이것을 클래스 바깥으로 끄집어내서 `dx`라는 이름을 가지는 매개변수는 `PositiveInteger` 조건을 가짐이 자명합니다- 라고 글로벌 변수차원에서 선언할 수 있게 만들어보자.
+
+`checked` 에 조금의 코드만 추가하면 된다.
+
+```python
+def checked(func):
+    sig = signature(func)
+    ann = ChainMap(
+        func.__annotations__,
+        func.__globals__.get('__annotations__'), {}
+    )
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        bound = sig.bind(*args, **kwargs)
+        for name, val in bound.arguments.items():
+            if name in ann:
+                ann[name].check(val)
+        return func(*args, **kwargs)
+    return wrapper
+```
+
+그렇다면 바뀐 `Player` 파일은 다음과 같다.
+
+```python
+from contract import Base, PositiveInteger
+
+dx: PositiveInteger
+
+class Player(Base):
+    name: NonEmptyString
+    x: Integer
+    y: Integer
+
+    def left(self, dx):
+        self.x -= dx
+
+    def right(self, dx):
+        self.x += dx
+
+p = Player('아드', 0, 0)
+p.left(-1)
+```
+
+```
+AssertionError: Must be > 0
+```
+
+짜잔! 끝!
