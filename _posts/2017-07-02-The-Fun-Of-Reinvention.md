@@ -293,7 +293,7 @@ class Contract:
 class NonEmpty(Contract):
     @classmethod
     def check(cls, value):
-        assert len(value) > 0, 'Must be nonmpty'
+        assert len(value) > 0, 'Must be nonempty'
         super().check(value)
 
 class NonEmptyString(String, NonEmpty):
@@ -826,4 +826,5 @@ p.left(-1)
 AssertionError: Must be > 0
 ```
 
-짜잔! 끝!
+짜잔!
+최종 소스코드는 [gist에서](https://gist.github.com/phillyai/c2f66ac2740f8921017bbd5f47a7eb08) 확인할 수 있습니다. 긴 글 읽어주셔서 감사합니다.
