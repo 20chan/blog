@@ -116,7 +116,7 @@ foreach (var i in list)
 
 filtered을 그대로 선언은 하지만 사용하지 않는 이 코드는 정상적으로 컴파일이 되고 작동도 잘 된다.
 더욱 당황한 나는 마음을 가다듬고 (..) filtered의 타입을 확인했다. 
-``System.Linq.Enumerable+<SelectIterator>d__5`2[System.Int32,System.ValueTuple`2[System.Int32,System.Int32]]`` 으로 에디터에서는 `IEnumerable<(int val, int index)>`로 표시되었다. 
+에디터에서는 `IEnumerable<(int val, int index)>`로 표시되었다. 
 혹시 LINQ에 문제가 있진 않을까? 하는 마음에 다음 코드를 실행해 보았다.
 
 ```csharp
