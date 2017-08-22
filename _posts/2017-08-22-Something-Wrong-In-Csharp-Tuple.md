@@ -1,6 +1,6 @@
 ---
 layout: post
-title: C# 7.0의 IEnumerable과 튜플
+title: Something Wrong In Csharp Tuple
 subtitle: C#의 튜플은 어디서부턴가 잘못되었다
 ---
 
