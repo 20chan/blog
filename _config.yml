@@ -46,14 +46,14 @@ avatar: "/img/avatar-icon.jpg"
 author:
   name: adnim
   email: "sonagi.philly@gmail.com"
-  facebook:   # eg. daattali
+  facebook: ars103  # eg. daattali
   github: phillyai    # eg. daattali
   twitter: dev_philly   # eg. daattali
-  reddit:     # eg. daattali
+  reddit: 0xadnim    # eg. daattali
   google-plus:    # eg. +DeanAttali or 109424658772469020925
-  linkedin:   # eg. daattali
+  linkedin:  # eg. daattali
   xing:       # eg. daattali
-  stackoverflow:   # eg. "3943160/daattali"
+  stackoverflow: 5906697/phillyai  # eg. "3943160/daattali"
   snapchat:   # eg. daattali
   instagram:  # eg. daattali
   youtube:    # eg. user/daattali or channel/daattali
@@ -68,10 +68,10 @@ footer-links-active:
   twitter: true
   google-plus: false
   github: true
-  reddit: false
+  reddit: true
   linkedin: false
   xing: false
-  stackoverflow: false
+  stackoverflow: true
   snapchat: false
   instagram: false
   youtube: false
