@@ -27,7 +27,7 @@ int Add(int a, int b) => a + b;
 
 이는 메서드에만 적용될 수 있는 게 아니라 프로퍼티에도 적용할 수 있다. 더 자세한 내용은 [MSDN](https://docs.microsoft.com/ko-kr/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)을 참고하자.
 
-내가 지금 전해 주고 싶은 내용은 간단하다. 앞으로 바뀌지 않은, 간단한 식에 대해서는 후자를 사용하자.
+내가 지금 전해 주고 싶은 내용은 간단하다. **앞으로 바뀌지 않을, 간단한 식에 대해서는 후자를 사용하자.**
 
 
 ## 왜??
