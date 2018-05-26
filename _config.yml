@@ -51,7 +51,7 @@ author:
   twitter: dev_philly   # eg. daattali
   reddit: 0xadnim    # eg. daattali
   google-plus:    # eg. +DeanAttali or 109424658772469020925
-  linkedin:  # eg. daattali
+  linkedin: 영찬-이-3727b6121 # eg. daattali
   xing:       # eg. daattali
   stackoverflow: 5906697/phillyai  # eg. "3943160/daattali"
   snapchat:   # eg. daattali
@@ -69,7 +69,7 @@ footer-links-active:
   google-plus: false
   github: true
   reddit: true
-  linkedin: false
+  linkedin: true
   xing: false
   stackoverflow: true
   snapchat: false
