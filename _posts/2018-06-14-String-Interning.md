@@ -49,25 +49,36 @@ After intern:
 
 하지만 여러개의 스레드에서 `string.Intern`은 사용할 수 있을까? 일단 `string.Intern` 은 스레드 안전한 메서드이다.
 
-비교적 적은 3개의 스레드에서 인터닝을 하고 비교하는것과 그렇지 않고 비교하는 두 메서드의 퍼포먼스를 비교해보자.
+우선 `ConcurrentDictionary`를 사용해서 직접 스레드 안전한 `Intern` 메서드를 만들어보자.
 
 ```csharp
-var s = string.Intern("string");
-void DoWithIntern()
+static ConcurrentDictionary<string, string> dic = new ConcurrentDictionary<string, string>();
+static string Intern(string str)
+    => dic.GetOrAdd(str, String.Copy);
+```
+
+그리고 100개의 스레드에서 테스트를 해보자.
+
+```csharp
+ConcurrentDictionary<string, string> dic = new ConcurrentDictionary<string, string>();
+string Intern(string str)
+    => dic.GetOrAdd(str, String.Copy);
+var s = Intern("i am very cool string");
+void NewIntern()
 {
     bool a;
     for (int i = 0; i < 100000; i++)
     {
-        var ss = string.Intern("string");
+        var ss = Intern("i am very cool string");
         a = s == ss;
     }
 }
-void DoWithoutIntern()
+void StringIntern()
 {
     bool a;
     for (int i = 0; i < 100000; i++)
     {
-        var ss = "string";
+        var ss = string.Intern("i am very cool string");
         a = s == ss;
     }
 }
@@ -75,7 +86,7 @@ void DoWithoutIntern()
 var sw = new Stopwatch();
 Thread[] threads = new Thread[100];
 for (int i = 0; i < threads.Length; i++)
-    threads[i] = new Thread(DoWithIntern);
+    threads[i] = new Thread(NewIntern);
 
 sw.Start();
 foreach (var t in threads)
@@ -84,11 +95,11 @@ foreach (var t in threads)
     t.Join();
 
 sw.Stop();
-Console.WriteLine($"With Intern: {sw.ElapsedMilliseconds} ms");
+Console.WriteLine($"With NewIntern: {sw.ElapsedMilliseconds} ms");
 
 threads = new Thread[100];
 for (int i = 0; i < threads.Length; i++)
-    threads[i] = new Thread(DoWithoutIntern);
+    threads[i] = new Thread(StringIntern);
 
 sw.Reset();
 sw.Start();
@@ -98,24 +109,8 @@ foreach (var t in threads)
     t.Join();
 
 sw.Stop();
-Console.WriteLine($"Without Intern: {sw.ElapsedMilliseconds} ms");
-Console.Read();
+Console.WriteLine($"With string.Intern: {sw.ElapsedMilliseconds} ms");
 ```
-
-```
-With Intern: 4084 ms
-Without Intern: 1179 ms
-```
-
-그렇다면 `ConcurrentDictionary`를 사용해서 직접 스레드 안전한 `Intern` 메서드를 만들어보자.
-
-```csharp
-static ConcurrentDictionary<string, string> dic = new ConcurrentDictionary<string, string>();
-static string Intern(string str)
-    => dic.GetOrAdd(str, String.Copy);
-```
-
-그리고 똑같이 100개의 스레드에서 테스트를 해보면 결과는 다음과 같다.
 
 ```
 With NewIntern: 2550 ms
