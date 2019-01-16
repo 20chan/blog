@@ -44,7 +44,7 @@ avatar: "/img/avatar-icon.jpg"
 # Change all these values or delete the ones you don't want.
 # Important: you must keep the "name" parameter, everything else you can remove
 author:
-  name: adnim
+  name: 20chan
   email: "sonagi.philly@gmail.com"
   facebook: ars103  # eg. daattali
   github: phillyai    # eg. daattali
