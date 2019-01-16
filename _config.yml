@@ -23,8 +23,9 @@ description: 삽질한거 나만 보기 아까워서 올림
 
 # List of links in the navigation bar
 navbar-links:
+  Portfolio: "https://github.com/phillyai/portfolio"
   About Me: "aboutme"
-  Resume: "https://github.com/phillyai/resume"
+  Contact: "contact"
   #Projects:
   #  - Beautiful Jekyll: "http://deanattali.com/beautiful-jekyll/"
   #  - Learn markdown: "http://www.markdowntutorial.com/"
