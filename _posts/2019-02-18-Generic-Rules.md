@@ -89,7 +89,7 @@ A<string>.Value: 20
 ```
 
 
-## C#<T> Java<T> Cpp<T>
+## C#\<T> Java\<T> Cpp\<T>
 
 C#, Java, C++ 세 언어 모두 제너릭을 지원하고 신택스도 거의 비슷하지만 작동 방식은 전혀 다르다.
 
@@ -179,3 +179,17 @@ TrueAnswer.Answer()
 
 
 C++의 템플릿 메타 프로그래밍을 이용한 흑마법이나 제너릭을 사용한 fork bomb 같은 걸 더 설명하고 싶지만 그건 다음 기회에
+
+## 참고한 문서
+
+https://medium.com/@antao.almada/netfabric-hyperlinq-optimizing-linq-348e02566cef
+
+https://stackoverflow.com/questions/31693/what-are-the-differences-between-generics-in-c-sharp-and-java-and-templates-i
+
+https://www.artima.com/intv/generics2.html
+
+http://www.informit.com/articles/article.aspx?p=605369&seqNum=5
+
+https://blogs.msdn.microsoft.com/ericlippert/2009/07/30/whats-the-difference-part-one-generics-are-not-templates/
+
+https://www.youtube.com/watch?v=D-tP16V17QI
