@@ -5,6 +5,6 @@ title: Contact
 
 ## Contact
 
-- email : [sonagi.philly@gmail.com](mailto:sonagi.philly@gmail.com)
+- email : [2@0chan.dev](mailto:2@0chan.dev)
 - github : [phillyai](https://github.com/phillyai)
 
