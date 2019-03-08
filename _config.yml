@@ -4,7 +4,7 @@
 # baseurl is the website's URL without the hostname
 
 # If you are building a simple GitHub user page (http://username.github.io) then use these settings:
-url: "http://phillyai.github.io"
+url: ""
 baseurl: ""
 
 # If you are building a GitHub project page then use these settings:
@@ -46,11 +46,11 @@ avatar: "/img/avatar-icon.jpg"
 # Important: you must keep the "name" parameter, everything else you can remove
 author:
   name: 20chan
-  email: "sonagi.philly@gmail.com"
+  email: "2@0chan.dev"
   facebook: ars103  # eg. daattali
   github: phillyai    # eg. daattali
-  twitter: dev_philly   # eg. daattali
-  reddit: 0xadnim    # eg. daattali
+  twitter:   # eg. daattali
+  reddit:   # eg. daattali
   google-plus:    # eg. +DeanAttali or 109424658772469020925
   linkedin: 영찬-이-3727b6121 # eg. daattali
   xing:       # eg. daattali
@@ -66,10 +66,10 @@ footer-links-active:
   rss: false
   facebook: true
   email: true
-  twitter: true
+  twitter: false
   google-plus: false
   github: true
-  reddit: true
+  reddit: false
   linkedin: true
   xing: false
   stackoverflow: true
@@ -82,13 +82,13 @@ footer-links-active:
 # Select which share links to show in posts
 share-links-active:
   twitter: true
-  facebook: false
+  facebook: true
   google: false
   linkedin: false
 
 # How to display the link to the website in the footer
 # Remove this if you don't want a link in the footer
-url-pretty: "phillyai.github.io"  # eg. "deanattali.com/beautiful-jekyll"
+url-pretty: "blog.0chan.dev"  # eg. "deanattali.com/beautiful-jekyll"
 
 # --- Misc --- #
 # Fill in your Disqus shortname (NOT the userid) if you want to support Disqus comments
