@@ -39,7 +39,7 @@ foreach (var i in list)
 }
 ```
 
-하지만 필자는 엄청난 변태이기 때문에 이런 방법을 선호하지 않는다. C#의 LINQ와 익명 형식을 사용하여 문제를 해결할 것이다.
+다음처럼 C#의 LINQ와 익명 형식을 사용하여 할 수도 있다.
 
 ```csharp
 int[] list = { 3, 1, 4, 1, 5, 9, 2 };
@@ -92,7 +92,7 @@ foreach (var (v, i) in list.Select((val, index) => (val, index)))
 ## 문제 분석
 
 우선 어딘가에 오류가 있는 것은 틀림 없으니 코드를 분리해가며 어디에 오류가 있는지 알아보려고 했다.
-먼저 문제가 되는 부분이라고 추측되는 list.Select.. 부분을 변수로 분리했다.
+먼저 문제가 되는 부분이라고 추측되는 `list.Select..` 부분을 변수로 분리했다.
 
 ```csharp
 int[] list = { 3, 1, 4, 1, 5, 9, 2 };
@@ -115,7 +115,7 @@ foreach (var i in list)
 ```
 
 filtered을 그대로 선언은 하지만 사용하지 않는 이 코드는 정상적으로 컴파일이 되고 작동도 잘 된다.
-더욱 당황한 나는 마음을 가다듬고 (..) filtered의 타입을 확인했다. 
+당황스러워서 나는 filtered의 타입을 확인했다. 
 에디터에서는 `IEnumerable<(int val, int index)>`로 표시되었다. 
 혹시 LINQ에 문제가 있진 않을까? 하는 마음에 다음 코드를 실행해 보았다.
 
@@ -132,7 +132,7 @@ foreach (var (i, v) in filtered)
 
 그래서 나는 생각의 방향을 약간 바꿔, 컴파일 타임에서 에러가 난더라고 해도 문제가 없는 코드인데 런타임에서는 에러가 안나질 않을까? 하는 생각을 했다.
 
-컴파일이 안되는데 어떻게 런타임에서 테스트를 하냐고? 간단하다. **정상적으로 컴파일된 프로그램을 디스어셈블리하여 코드를 수정하면 된다.**
+정상적으로 컴파일된 프로그램을 디스어셈블리하여 코드를 수정해서 돌아갈 수 있는 코드인지 확인해보기로 했다.
 
 ## 삽질의 시작
 
@@ -150,15 +150,13 @@ foreach (var (i, v) in dummy)
 
 당연히 아무 출력을 하지 않고 프로그램이 종료된다. 이제 이 컴파일된 어셈블리를 디스어셈블리 툴을 사용하여 분석해보자.
 
-나는 JetBrain의 dotPeek, Red Gate의 .Net Reflector와 IL 코드를 수정할 수 있게 해주는 확장 툴 Reflexil을 사용하였다.
+JetBrain의 dotPeek, Red Gate의 .Net Reflector와 IL 코드를 수정할 수 있게 해주는 확장 툴 Reflexil을 사용하였다.
 
 ![.Net Reflector을 사용해 프로그램을 디스어셈블리](/img/reflector.png)
 
-성공적으로 코드가 전부 보인다! (참고로 dotPeek을 통해 디스어셈블리한 C#코드와 IL코드는 훨씬 친절하고 IL코드에 대해 잘 모르는 사람도 어느정도 코드를 이해할 수 있으니 본인에게 맞는 툴을 사용하자)
+foreach 문의 dummy (.Net Reflector에서는 tupleArray라고 나와있는) 부분을 원래 목적이었던 filtered (.Net Reflector에서는 enemerable라고 나와있는) 로 바꿔채야 한다.
 
-우리는 foreach 문의 dummy (.Net Reflector에서는 tupleArray라고 나와있는) 부분을 원래 목적이었던 filtered (.Net Reflector에서는 enemerable라고 나와있는) 로 바꿔채야 한다!
-
-별 거 없다. 우선 IL 코드 중 변수가 선언되는 부분은 다음과 같다.
+우선 IL 코드 중 변수가 선언되는 부분은 다음과 같다.
 ```IL
  IL_0013: ldc.i4.0     
     IL_0014: newarr       valuetype [mscorlib]System.ValueTuple`2<int32, int32>
@@ -179,7 +177,7 @@ foreach (var (i, v) in dummy)
     IL_003f: stloc.2      // filtered
 ```
 
-우리가 여기서 알 수 있는 것은 변수 list는 스택의 0번째에, dummy는 스택의 1번째에, filtered는 스택의 2번째에 선언되었다는 것이다.
+여기서 알 수 있는 것은 변수 list는 스택의 0번째에, dummy는 스택의 1번째에, filtered는 스택의 2번째에 선언되었다는 것이다.
 
 그리고 IL 코드 중 루프가 시작되는 부분은 다음과 같다.
 
@@ -210,7 +208,7 @@ foreach (var (i, v) in dummy)
 
 ![잘못된 타입 캐스팅](/img/type_error.png)
 
-다름아닌 `IEnumerable<(int, int)>`타입인 enumerable이 `(int, int)[]` 형식으로 강제 캐스팅되던 것이다. 물론 확실하진 않다. 하지만 `dummy`의 타입을 바꿈으로써 다시 시도해볼 가치가 충분히 있다!
+다름아닌 `IEnumerable<(int, int)>`타입인 enumerable이 `(int, int)[]` 형식으로 강제 캐스팅되던 것이다. `dummy`의 타입을 바꿔서 테스트해보자.
 
 그리하여 다시 작성한 코드이다.
 
@@ -228,6 +226,16 @@ foreach (var (i, v) in dummy)
 
 ![드디어 성공!](/img/success.png)
 
-드디어 성공이다!! 이로써 런타임에서 처음 빌드가 되질 않았던 코드는 에러 없이 잘 작동함을 확인했다. 그말은 즉, 이는 C# 컴파일러 Roslyn의 문제라는 것이 확실해졌음을 의미한다! 난 잘못한 게 없다 만세!
+이로써 런타임에서 처음 빌드가 되질 않았던 코드는 에러 없이 잘 작동함을 확인했다. 그말은 즉, 이는 C# 컴파일러 Roslyn의 문제라는 것이 확실해졌음을 의미한다.
 
 그래서 Roslyn의 깃헙 리포에 들어가 이슈를 검색해봤지만 이 버그에 관한 이슈는 없길래 이슈를 보고할 생각이다! 이에 관한 내용은 다음에 추가하도록 하겠다.
+
+## 뒷이야기
+
+이 글을 작성한지는 1년 가까이 됐지만 갑자기 생각나서 덧붙여본다.
+
+[이슈를 올렸다.](https://github.com/dotnet/roslyn/issues/21656)
+
+아직 정식 릴리즈되지 않았던 VS 버전에서 패치가 되었다는 이야기였다.
+역시 세상에 능력자는 많다
+
