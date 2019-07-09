@@ -23,7 +23,7 @@ description: 삽질한거 나만 보기 아까워서 올림
 
 # List of links in the navigation bar
 navbar-links:
-  Portfolio: "https://github.com/phillyai/portfolio"
+  Portfolio: "https://github.com/20chan/portfolio"
   About Me: "aboutme"
   Contact: "contact"
   #Projects:
@@ -48,7 +48,7 @@ author:
   name: 20chan
   email: "2@0chan.dev"
   facebook: ars103  # eg. daattali
-  github: phillyai    # eg. daattali
+  github: 20chan    # eg. daattali
   twitter:   # eg. daattali
   reddit:   # eg. daattali
   google-plus:    # eg. +DeanAttali or 109424658772469020925
