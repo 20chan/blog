@@ -23,6 +23,7 @@ description: 삽질한거 나만 보기 아까워서 올림
 
 # List of links in the navigation bar
 navbar-links:
+  Home: ""
   Portfolio: "https://github.com/20chan/portfolio"
   About Me: "aboutme"
   Contact: "contact"
