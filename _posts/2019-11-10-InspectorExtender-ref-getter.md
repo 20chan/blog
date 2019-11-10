@@ -176,3 +176,12 @@ static void SetValueOfRefProperty<TP, TC>(PropertyInfo p, TC instance, TP value)
 정말 기능적으로 돌아가기는 잘 돌아가더라. 유니티에서도 잘 돌아가기는 했는데 인스펙터에서 계속 해출해서 그떄마다 저렇게 리플렉션에서 메서드 제너레이션을 하면 엄청 느리고 메모리 릭 등도 걱정되더라. 반복 호출에 문제가 있는지 확인을 해야하고 있다면 캐싱을 하던 해야할텐데 몇시간 써도 당장 큰 문제는 없었던 것 같다.
 
 유니티 정말 싫다.
+
+## 추가로
+
+```csharp
+var funcType = typeof(Action<,>);
+var delType = funcType.MakeGenericType(typeof(TC), typeof(TP));
+```
+
+이 코드는 그냥 `typeof(Action<TC, TP>)` 을 쓰면 됨. 근데 원래 유니티에서 오브젝트 타입을 제너릭으로 못넘기는 코드에서 처음 만들었던 부분이 남아있어 위처럼 괴상한 코드만 남아있다
