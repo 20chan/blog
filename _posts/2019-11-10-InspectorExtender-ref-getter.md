@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Unity InspectorExtender - `ref getter`
+title: ref return property in Unity Inspector
 subtitle: C# DynamicMethod, ILGenerator 실사용
 ---
 
@@ -20,6 +20,7 @@ subtitle: C# DynamicMethod, ILGenerator 실사용
 그럭저럭 잘 돌아가서 별 문제없이 사용하고 있었는데 첫 불편함을 느꼈었던건 여러 오브젝트를 쉽게 관리하기위한 관리 오브젝트를 만들던 떄였다.
 
 ## 발단
+
 
 ```csharp
 public class Manager {
