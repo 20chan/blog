@@ -4,7 +4,7 @@ title: Unable to Search in Marketplace
 subtitle: vscode 정말 이상한 버그 디버깅
 ---
 
-이 글은 [vscode#86631] 내용을 그냥 정리해둔 것
+이 글은 [vscode#86631](https://github.com/microsoft/vscode/issues/86631) 내용을 그냥 정리해둔 것
 
 ## 발단
 
@@ -135,3 +135,5 @@ https://az764295.vo.msecnd.net/experiments/vscode-experiments.json
 
 아무에게도 일어나지 않는 버그를 직접 디버깅하고 원인 찾아내고 해결하는거 너무 사이버펑키하다
 그리고 간지난다
+
+그리고 회사에서 뻘짓만 하는게 아님 원래열심히일함
