@@ -137,3 +137,23 @@ https://az764295.vo.msecnd.net/experiments/vscode-experiments.json
 그리고 간지난다
 
 그리고 회사에서 뻘짓만 하는게 아님 원래열심히일함
+
+## +업데이트
+
+[이슈 코멘트](https://github.com/microsoft/vscode/issues/86631#issuecomment-564479018)
+
+저 svg 파일을 가능한한 복구해서 확인해보았다.
+
+![recovered](/img/recovered-svg.png)
+
+git 관련 아이콘같고 분명 어디선가 본 것 같은데 싶었다.
+그 뒤 네트워크에서 다른 리퀘스트를 계속 보다가 이 텍스트를 다음 리퀘스트에서 발견했다.
+
+```
+file:///..../AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/extensions/git/resources/icons/dark/open-change.svg
+```
+
+그래서 더 이상해서 다시 이 문제의 `vscode-experiments.json` 리퀘스트를 보니 상태 코드 부분이 `Status code: 200 (from disk cache)` 이더라. 분명 잘못 캐쉬되서 그랬나봄. 캐쉬 지우니까 정상적으로 작동은 했는데 여전히 이유는 모른다.
+게다가 캐쉬를 지우니까 이제 재현도 안됨.
+
+깃헙 이슈에서는 `I remember you are chiming in for some experiments related issues. So assigning to you,` 라며 이 답도없는 문제를 쉽게 떠넘겨버리는 과감함에 일은 저렇게 해야함을 배웠다.
