@@ -238,3 +238,48 @@ AWS는 EC2와 라이트세일에서 outbound [25포트를 막아놨다](https://
 사실 릴레이서버도 이미 무료 smtp서버 [sendgrid](https://sendgrid.com)를 알아보고 설정해봤는데 작동하지 않아서 일단 AWS탓을 하면서 기다리는 중이다.
 
 AWS에서 답장이 오면 이어서 작업하고 글을 마무리해야겠다
+
++ 06/16
+하지만 답장이 오기 전 왜 릴레이가 안되지부터 다시 잡아보았다
+
+## 릴레이
+
+분명 DEFAULT_RELAY_HOST, RELAY_HOST, 그리고 setup.sh 에서 relay까지 전부 넣었는데 막상 도커 컨테이너 안에 들어가서 검색하면 안나오는거임
+비슷한 이슈를 찾아봐도?? 딱히 없고
+
+그래서 혹시나 해서 `docker-compose restart`로 서버를 재시작하던걸 다시 `docker-compose down && docker-compose up -d` 로 내렸다 다시 올렸더니 이제서야 relay 호스트가 등록이 되었더라고 진짜 개당황스럽지만 됐다는 기쁨이 더 크다
+
+암튼 그래서 이제 정말로 릴레이로 바로 이어지는데? 내가 사용한 릴레이서버 sendgrid에서 이렇게 응답이 온다
+
+```log
+Jun 16 05:56:24 mail postfix/smtp[1631]: Trusted TLS connection established to smtp.sendgrid.net[161.202.148.182]:587: TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)
+Jun 16 05:56:25 mail postfix/smtp[1631]: EAE0B84DE57: to=<{}@gmail.com>, relay=smtp.sendgrid.net[161.202.148.182]:587, delay=1.1, delays=0/0/0.83/0.23, dsn=5.0.0, status=bounced (host smtp.sendgrid.net[161.202.148.182] said: 550 The from address does not match a verified Sender Identity. Mail cannot be sent until this error is resolved. Visit https://sendgrid.com/docs/for-developers/sending-email/sender-identity/ to see the Sender Identity requirements (in reply to end of DATA command))
+Jun 16 05:56:25 mail postfix/cleanup[1630]: 0798784DE58: message-id=<20200616055625.0798784DE58@mail.{domain}>
+Jun 16 05:56:25 mail postfix/bounce[1642]: EAE0B84DE57: sender non-delivery notification: 0798784DE58
+```
+
+
+그래서 sendgrid에서 일단 도메인 DNS verification을 해봤다 거기서 말한대로 CNAME DNS 몇개 추가하고 나니까 바로 도메인 verification이 끝나고, 그리고 다시 이메일을 보내보니??
+
+![email sent successfully](/img/smtp-relay.png)
+
+그리고 릴레이서버에서도 로그를 확인할 수 있었다
+
+![free 1/100](/img/sendgrid-activity.png)
+
+성공적으로 메일 받기, 보내기까지 끝냈다 정말 대단해~~!!!!
+
+### Reverse DNS
+
+남은 하나는 SMPTD 배너다
+dns reverse lookup 호스트가 일치하지 않아 여러곳에서 경고를 보내는데 이것도 aws ec2제한이더라고
+이거 역시 email send request 답장이 오면 볼 수 있겠다
+
+## 끝?
+
+일단 aws 문제 이후 정말 마지막을 볼 수 있겠지만
+그래도 나름 메일 송수신이 되는 메일 서버를 다 만들고 나니 너무 감개무량하다
+
+docker-mailserver 라는 완전 편리한게 있어서 이정도 삽질로 끝난게 다행이지 아니었으면 얼마나 고생했을지 끝은 볼 수 있었는지 상상도 안간다
+
+탈구글에 한발자국 다가간 것 처럼 느껴지지만 그래도 아직은 아니다 정말로 이걸 실사용할 수 있을지는 두고 봐야지
