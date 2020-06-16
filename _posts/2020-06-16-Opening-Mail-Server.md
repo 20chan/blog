@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Opening Mail Server
-subtitle: 10시간 삽질기
+subtitle: 15시간 삽질기
 ---
 
 아무리 이상하고 쓸데없는걸 많이 하는 프로그래머들에게도 '그걸 왜해' 하는 일들이 있다. 메일 서버가 그중 하나일만큼 정말 쓸데없고 귀찮다.
