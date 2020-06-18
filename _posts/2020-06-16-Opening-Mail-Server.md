@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Opening Mail Server
-subtitle: 20시간 삽질기
+subtitle: 21시간 삽질기
 ---
 
 아무리 이상하고 쓸데없는걸 많이 하는 프로그래머들에게도 '그걸 왜해' 하는 일들이 있다. 메일 서버가 그중 하나일만큼 정말 쓸데없고 귀찮다.
@@ -17,7 +17,7 @@ subtitle: 20시간 삽질기
 - 스팸 필터링
 - 10초 이내의 메일 알림
 
-그리고 결론적으로 IMAP과 SMTP, 인증서, SPF, DKIM 등을 지원하는 보안 이메일 서비스를 만들었다.
+그리고 결론적으로 IMAP과 SMTP, SIEVE, 인증서, SPF, DKIM, DMARC 등을 지원하는 보안 이메일 서비스를 만들었다.
 
 ## 준비
 
@@ -381,6 +381,24 @@ volumes:
 하지만 당연히 이런 찜찜함으로는 못버티겠더라. 구글 도메인 포워딩을 버리고 그냥 다른 도메인에서 이 메일서버로 alias 계정으로 등록해버리기로 했다.
 
 구글 도메인에서 이메일 포워딩을 지우고, MX 레코드를 이 메일 서버로 연결한 다음 dns적용까지 기다렸다가 메일을 보내보니 성공적으로 메일이 보내졌다. 구글 개싫어
+
+## SIEVE
+
+지메일에서의 필터와 같은 이메일 필터링 및 스크립트를 작성할 수 있는 SIEVE를 추가했다. 서버에서는 단순히 옵션을 키기만 하면 됐고, rainloop 클라이언트에서도 어드민 페이지에서 도메인에 SIEVE configuration 설정만 해주면 바로 적용이 됐다.
+
+![email sieve](/img/email-sieve.png)
+
+이런식으로 간단하게 필터하여 메일함으로 보내거나 전달, 거부 등의 액션이 지메일과 같이 가능하고 혹은 다음처럼 유저 스크립트를 작성할 수도 있다.
+
+```sieve
+require ["fileinto", "reject"];
+
+if size :over 100M {
+    reject "I'm sorry, I do not accept mail over 100M in size.";
+} else {
+    keep();
+}
+```
 
 ## 끝
 
