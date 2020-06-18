@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Opening Mail Server
-subtitle: 15시간 삽질기
+subtitle: 20시간 삽질기
 ---
 
 아무리 이상하고 쓸데없는걸 많이 하는 프로그래머들에게도 '그걸 왜해' 하는 일들이 있다. 메일 서버가 그중 하나일만큼 정말 쓸데없고 귀찮다.
@@ -51,7 +51,7 @@ $ curl -o .env https://raw.githubusercontent.com/tomav/docker-mailserver/master/
 
 ```env
 HOSTNAME=mail
-DOMAINNAME=0ch.me
+DOMAINNAME={domainname}
 CONTAINER_NAME=mail
 ```
 
@@ -195,8 +195,7 @@ DNS에 다음 softfail spf를 추가한다.
 @   TXT "v=spf1 mx ~all"
 ```
 
-테스트하는 도중에는 이렇게 쓸 수 있고 나중에 이를 hardfail spf로 바꿔야 한다는 것 같음 자세한건 [위키](https://github.com/tomav/docker-mailserver/wiki/Configure-SPF)
-
+자세한건 [위키](https://github.com/tomav/docker-mailserver/wiki/Configure-SPF)
 
 ### dkim
 
@@ -239,7 +238,7 @@ AWS는 EC2와 라이트세일에서 outbound [25포트를 막아놨다](https://
 
 AWS에서 답장이 오면 이어서 작업하고 글을 마무리해야겠다
 
-+ 06/16
+\+ 06/16
 하지만 답장이 오기 전 왜 릴레이가 안되지부터 다시 잡아보았다
 
 ## 릴레이
@@ -283,3 +282,111 @@ dns reverse lookup 호스트가 일치하지 않아 여러곳에서 경고를 �
 docker-mailserver 라는 완전 편리한게 있어서 이정도 삽질로 끝난게 다행이지 아니었으면 얼마나 고생했을지 끝은 볼 수 있었는지 상상도 안간다
 
 탈구글에 한발자국 다가간 것 처럼 느껴지지만 그래도 아직은 아니다 정말로 이걸 실사용할 수 있을지는 두고 봐야지
+
+## EC2
+
+메일 답장이 왔다.
+
+![aws-replied](/img/aws-reply.png)
+
+요약하자면
+
+1. 메일을 왜 보내야 하는지 이유가 필요하다.
+2. 스팸메일 방지를 위해 어떤 설정을 했는지 알아야 한다.
+3. PTR 설정이나 SMTP time out (outboudn 25 port blocked)같은 작업을 정확하게 어떻게 원하는지 알아야 한다.
+
+리퀘스트 폼을 너무 대충 작성해서 그랬나보다. 개인적인 사용 목적으로 메일 서비스를 열었고, 스팸방지를 위해 어떠한 처리를 했으며, Reverse DNS 설정을 위한 IP와 호스트까지 구체적으로 메일로 답장을 하니 2시간만에 다음과 같은 답장이 왔다.
+
+```
+Hello,
+
+We have configured the reverse DNS record(s) you requested! Your request was mapped for the following:
+...
+```
+
+그래서 바로 확인해보니 Reverse DNS도 바로 적용됐고 이전에는 타임아웃만 나던 25포트 SMTP 연결이 이젠 잘 된다. 바로 릴레이 서버 다시 지우고 원래대로 바꾼 다음, 다시 메일 보내기 테스트를 해봤는데 아무 이상없이 잘 되더라. 정말 빠르고 확실한 AWS 대응이 너무 좋았다.
+
+## SPF Error with Auto Forwarding
+
+이젠 정말 문제가 없을거라 생각하고 기존에 메인으로 사용하던 다른 도메인의 이메일 `2@0chan.dev`도 이 서버 메일 계정으로 포워딩하고 메일 alias로 만들어 메일을 보내기도 하게 해두었다. 
+
+지메일로 `2@0chan.dev` 계정으로 메일을 보냈을 때는 정상적으로 메일이 도착했고, 반대로 `2@0chan.dev` 메일로 지메일에 메일을 보내도 정상적으로 도착했다. 하지만 여기서 문제가 하나 생겼다
+
+페이스북 로그인에서 보안 코드를 입력해야 하는데, 저 `2@0chan.dev` 메일로 이메일이 갔다고 하는데 메일이 도착하지 않아서 서버 로그를 보니 다음 에러가 나있다.
+
+```log
+Jun 18 05:26:46 mail postfix/smtpd[3784]: Anonymous TLS connection established from mail-wm1-f52.google.com[209.85.128.52]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits) key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
+Jun 18 05:26:46 mail policyd-spf[3792]: 550 5.7.23 Message rejected due to: SPF fail - not authorized. Please see http://www.openspf.net/Why?s=mfrom;id=security@facebookmail.com;ip=209.85.128.52;r=<UNKNOWN>
+Jun 18 05:26:46 mail postfix/smtpd[3784]: NOQUEUE: reject: RCPT from mail-wm1-f52.google.com[209.85.128.52]: 550 5.7.23 <{mail}>: Recipient address rejected: Message rejected due to: SPF fail - not authorized. Please see http://www.openspf.net/Why?s=mfrom;id=security@facebookmail.com;ip=209.85.128.52;r=<UNKNOWN>; from=<security@facebookmail.com> to=<{mail}> proto=ESMTP helo=<mail-wm1-f52.google.com>
+```
+
+에러 메시지는 `550 Message rejected due to: SPF fail - not authorized` 즉 SPF 단계에서 문제가 생겼다는 건데 그렇다면 내 SPF 설정이 잘못됐다면 다른 서버에서 메일을 받는 것도 안되야 할텐데? 해서 보니까 메일을 보내는 주소가 `facebookmail.com`이 아닌 `mail-wm1-f52.google.com`로 되어 있다.
+
+이게 구글 도메인에서 메일 포워딩을 해서 아마 sender 주소가 저렇게 잡히는 거일텐데 이게 내가 rewrite를 하는 서버도 아니고 도대체 어떻게 해야하지?
+하지만 뭔가 이상하다. 지메일에서 보내면 원래 주소가 구글이라 허용이 된다는 것도 이상하고 네이버에서 메일을 보내봤는데 정상적으로 메일이 받아졌다.
+
+```log
+Jun 18 06:06:53 mail postfix/smtpd[3327]: Anonymous TLS connection established from mail-pl1-f174.google.com[209.85.214.174]: TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits) key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
+Jun 18 06:06:54 mail policyd-spf[3335]: prepend Received-SPF: Softfail (mailfrom) identity=mailfrom; client-ip=209.85.214.174; helo=mail-pl1-f174.google.com; envelope-from={naverid}@naver.com; receiver=<UNKNOWN>
+Jun 18 06:06:54 mail postfix/smtpd[3327]: 523409C621D: client=mail-pl1-f174.google.com[209.85.214.174]
+Jun 18 06:06:54 mail postsrsd[3342]: srs_forward: <{naverid}@naver.com> rewritten as <SRS0=zTcK=77=naver.com={naverid}@{email}>
+Jun 18 06:06:54 mail postfix/cleanup[3341]: 523409C621D: message-id=<f45672d73c882cffbd78cc6f702186@cweb004.nm.nfra.io>
+Jun 18 06:06:54 mail opendkim[191]: 523409C621D: mail-pl1-f174.google.com [209.85.214.174] not internal
+Jun 18 06:06:54 mail opendkim[191]: 523409C621D: not authenticated
+Jun 18 06:06:54 mail opendkim[191]: 523409C621D: DKIM verification successful
+```
+
+분명 HELO는 구글주소지만 softfail로 이메일이 받아진다. HELO가 authorize되지 않아도 메일을 받기는 하지만 체크를 해두는 방식이라 메일이 보내지는 것이다.
+
+예를 들어 네이버는 다음처럼 softfail spf를 사용한다.
+
+```DNS
+naver.com       text = "v=spf1 [include:...] ~all"
+```
+
+구글도 마찬가지로 softfail spf를 사용한다.
+
+```DNS
+google.com      text = "v=spf1 include:_spf.google.com ~all"
+```
+
+하지만 문제가 되는 페이스북 메일은 fail spf를 사용한다.
+
+```DNS
+facebookmail.com        text = "v=spf1 [ip4:...] -all"
+```
+
+하지만 이게 구글측에서 메일 포워딩을 하는데 [SRS](https://github.com/tomav/docker-mailserver#srs-sender-rewriting-scheme)을 안해주는 문제라면 내가 어떻게 할 수 있는게 아니지 않나?
+
+아무튼 일단 SPF 보안 수준을 한단계 낮춰서 FAIL까지 메일을 받도록 컨피그 파일을 수정해보자. 이 규칙은 docker-mailserver 에서 밖으로 빠져있지는 않았고, 수동으로 파일을 찾아서 넣어주기로 했다. 파일은 컨테이너의 `/etc/postfix-policyd-spf-python/policyd-spf.conf`에 있었고 이 파일을 수정하기 위해 밖에서 똑같은 파일을 만듦 `HELO_REJECT` 값을 다음처럼 NULL로 바꿔줬다
+
+```config
+debugLevel = 1
+TestOnly = 1
+HELO_reject = Null
+Mail_From_reject = Fail
+```
+
+그리고 `docker-compose.yml` 파일에서 이 파일을 저 경로로 넣어주게끔 volume을 추가했다
+
+```yml
+volumes:
+  - ./config-policyd/policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
+```
+
+그렇게 해서 일단 설정이 적용된건지 확인해보고 싶은데 페이스북 로그인 메일 보내기를 좀 많이 했더니 페이스북에서 메일을 보내려면 더 기다려야 한다고 밴을 먹어서.. 일단은 이정도로 정리했다.
+
+## Forward
+
+하지만 당연히 이런 찜찜함으로는 못버티겠더라. 구글 도메인 포워딩을 버리고 그냥 다른 도메인에서 이 메일서버로 alias 계정으로 등록해버리기로 했다.
+
+구글 도메인에서 이메일 포워딩을 지우고, MX 레코드를 이 메일 서버로 연결한 다음 dns적용까지 기다렸다가 메일을 보내보니 성공적으로 메일이 보내졌다. 구글 개싫어
+
+## 끝
+
+![email spam score](/img/email-score.png)
+
+추가로 dmarc설정만 하니까 [mail-tester](https://www.mail-tester.com/)에서 만점을 받았다.
+
+정말 만족스럽고, 앞으로 클라이언트만 내 손에 맞게 만지면 이보다 더 좋을 수는 없을 것 같다.
+힘들었고 삽질도 정말 많이했지만 배운 것도 많고 무엇보다 정말 재밌었다.
