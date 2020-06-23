@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Opening Mail Server
-subtitle: 21시간 삽질기
+subtitle: 26시간 삽질기
 ---
 
 아무리 이상하고 쓸데없는걸 많이 하는 프로그래머들에게도 '그걸 왜해' 하는 일들이 있다. 메일 서버가 그중 하나일만큼 정말 쓸데없고 귀찮다.
@@ -399,6 +399,109 @@ if size :over 100M {
     keep();
 }
 ```
+
+\+ 06.23
+
+데스크탑 환경에서는 메일 알림 설정을 해두면 메일창을 열어두지 않으면 조금 느리지만 그래도 알림이 꽤 빨리 오긴 한다. 평균적으로 1분 이내에는 왔고 이게 윈도우 기본 메일 클라이언트에 등록된 gmail보다 빠르다.
+
+하지만 모바일에서 메일 알림을 받으려면 메일 서버를 등록하거나 서드파티 메일 어플리케이션을 사용하거나 해야하는데 그렇게 하기가 귀찮아서 IFTTT와 sieve pipe를 이용해 직접 모바일 메일 알림을 구현하기로 했다.
+
+### ITFFF, sieve-execute
+
+`docker-mailserver`에서 메일 필터링에 사용하는 dovecot의 sieve는 위처럼 메일별 유저 스크립트를 실행하게 해주는데, 여기서 `sieve-extprogram` 이라는 플러그인을 사용하면 외부 프로그램을 호출할 수 있어 스크립트를 작성하고, 메일이 오자마자 즉시 프로그램으로 파이프라이닝이 가능하게 해준다. 그렇다면 IFTTT 웹훅으로 리퀘스트를 날려주는 프로그램에 파라미터를 넘겨 실행만 해주면 모바일로 바로 알림이 오게끔 할 수 있다.
+
+가장 먼저 IFTTT 애플릿 설정을 해준다.
+
+![ifttt service](/img/ifttt-email-received.png)
+
+웹훅을 받으면 모바일 알림을 보내는 간단한 애플릿을 만들었고, 위처럼 rich 메시지 포맷을 적당히 해줬다. 받는 사람 `{{Value2}}`, 보내는 사람 `{{Value1}}`, 제목 `{{Value3}}` 으로 세개의 파라미터를 적절히 사용했다.
+
+그리고 웹훅을 보내는 간단한 쉘 스크립트를 작성해준다.
+
+```bash
+#!/bin/bash
+json_escape () {
+    printf '%s' "$1" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
+}
+
+EVENT_NAME=""
+API_KEY=""
+URL="https://maker.ifttt.com/trigger/$EVENT_NAME/with/key/$API_KEY"
+P1=$(json_escape "$1")
+P2=$(json_escape "$2")
+P3=$(json_escape "$3")
+PARAMS=$(printf '{"value1":%s,"value2":%s,"value3":%s}' "$P1" "$P2" "$P3")
+
+echo "$PARAMS"
+
+curl \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d "$PARAMS" \
+  $URL
+
+```
+
+이걸 만드는 당시에는 저 `EVENT_NAME`과 `API_KEY`를 고정값으로 박아버렸지만, 상식적으로 이걸 파라미터나 환경변수로 넘기는게 맞다. 하지만 이거는 나 혼자만 쓸거라 상관없지롱
+
+그렇게 이 스크립트를 `config/sieve-pipe/notify.sh` 경로에 저장하면 알아서 도커에서 스크립트를 sieve-pipe에서 실행할 수 있는 경로로 복사해주고 퍼미션을 준다. 그렇다면 남은건 sieve 유저 스크립트를 작성하는 것
+
+문제는 [위키의 sieve 페이지](https://github.com/tomav/docker-mailserver/wiki/Configure-Sieve-filters)의 예제코드에 보이는것처럼 `pipe` 액션을 사용하면 에러가 나서 sieve 스크립트 컴파일 에러가 난다는 것
+
+일단 dovecot의 [공식 sieve-pipe 문서](https://wiki2.dovecot.org/Pigeonhole/Sieve/Plugins/Pipe) 에서는 `pipe` 액션을 물론 `:args` 로 파라미터를 넘길수도 있는데 둘 다 안됐고 여기서 도움을 받아 문서를 천천히 읽어보다 버젼 0.3 이상에서는 pipe가 아닌 extprograms이고, [docker-mailserver sieve 설정](https://github.com/tomav/docker-mailserver/blob/master/target/dovecot/90-sieve.conf)을 보면 이미 플러그인으로 `sieve_extprograms` 요놈을 불러오는걸 알 수 있다. 그렇다면 문제는 extension으로 `vnd.dovecot.execute` 요놈도 같이 불러와야 `execute` 액션으로 파이프, 필터 등의 프로그램 실행이 가능한데 도커 이미지에서는 이걸 바꿀 수 있는 부분이 없어서 추가로 설정 파일을 만들어서 오버라이드 해야 했다.
+
+저 설정파일은 컨테이너에서 `/etc/dovecot/conf.d/##-*.conf` 로 들어간다.
+적당한 경로에 설정을 오버라이드할 파일을 만들자. `dovecot/95-sieve-override.conf`
+
+```conf
+plugin {
+  sieve_extensions = +notify +imapflags +vnd.dovecot.pipe +vnd.dovecot.filter +vnd.dovecot.execute
+  sieve_execute_bin_dir = /usr/lib/dovecot/sieve-pipe
+}
+```
+
+extensions 마지막 `+vnd.dovecot.execute`을 추가해줬고, 아까 sieve-pipe경로에 넣었던 스크립트를 execute에서도 사용가능하게끔 경로를 설정해줬다. 마지막으로 `docker-compose.yml` 파일도 수정해준다.
+
+```yml
+volumes:
+  # ...
+  - ./dovecot/95-sieve-override.conf:/etc/dovecot/conf.d/95-sieve-override.conf
+```
+
+그리고 재시작하면 클라이언트에서 다음처럼 아까는 보이지 않았던 `vnd.dovecot.execute` extension이 보이는 것을 알 수 있다
+
+![rainloop extension loaded](/img/rainloop-extension.png)
+
+그리고 다음처럼 유저 스크립트를 작성해준다.
+
+```sieve
+require ["variables", "copy", "envelope", "vnd.dovecot.execute"];
+
+if envelope :matches "from" "*" { set "from" "${1}"; }
+if header :matches "subject" "*" { set "subject" "${1}"; }
+
+execute "notify.sh" ["{myemail}","${from}","${subject}"];
+```
+
+그리고 메일을 다른 계정에서 보내서 테스트를 해보면??
+
+![email received noti srs](/img/ifttt-mail-srs.jpg)
+
+이렇게 메일 알림이 바로 온다!! 하지만 메일을 보내는 주소가 이상하다. 이건 내가 옵션에서 SRS을 켜뒀기 때문이라 SRS을 끄고 재시작하고 다시 테스트를 해보면?
+
+![email received noti](/img/ifttt-mail.jpg)
+
+이렇게 정상적으로 메일 주소가 보이고, 메일 제목도 잘 표시된다. 이제 정말 원한이 없다..
+
+## Cloudflare
+
+위 sieve 삽질이 길어졌던 이유중 다른 이유가 있다. 이 메일 서비스 말고 다른 작업에서 DNS api를 사용해 뭔가를 하는 서비스가 필요해 도메인 네임서버를 기존 구글 도메인 DNS에서 Cloudflare로 옮겼다. 이때까지만 해도 이게 나를 그렇게 괴롭힐줄은 몰랐다
+
+가장 먼저는 외부에서 IMTP, SMTP 서버 접근이 아예 안됐다. 처음엔 sieve때문에 터져서 재시작하면 되는가싶더니, 재시작해도 안되고 정말 아주 가끔씩 되다가 다시 안되고를 반복하길래 아예 서버가 죽어버렸나 하고 포기할때쯤 도메인이 아닌 ip주소로 직접 접속하니 되는걸 보고 DNS문제구나 알았다. MX lookup을 돌려보니 IP 로드밸런싱이 되면서 origin ip를 expose 하지 않는다.. 하면서 아무튼 지멋대로 막 바껴서 돌아가는 와중에 [Cloudflare의 메일 셋업 글](https://support.cloudflare.com/hc/en-us/articles/200168876-Email-undeliverable-when-using-Cloudflare)을 보았다. 메일 관련 records를 전부 cloudflare proxy를 지나지 않게 해제하고, 다른 문제때문에 다음처럼 캐쉬, 최적화 등도 껐다. 유료 옵션인줄 알았던 캐싱, 로드밸런싱 등이 자기 멋대로 애매하게 돌아가는게 너무 짜증났다
+
+![cloudflare page rules](/img/cloudflare-page-rules.png)
+
+아무튼 MX레코드, origin ip exposing 문제 등도 적당히 눈감아 해결하니 다시 예전처럼 문제없이 접속이 잘 되더라
 
 ## 끝
 
