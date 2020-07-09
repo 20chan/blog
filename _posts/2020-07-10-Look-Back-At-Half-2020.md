@@ -19,8 +19,11 @@ subtitle: 2020년 절반 회고
 
 작년에 웹과 서버를 처음 만져본 뒤로 올해의 주제는 웹, 특히 서버가 아닐까 싶다. 작년에 한창 개발했던 .net core 기반 서버 프레임워크 [CreamRoll](https://github.com/20chan/CreamRoll) 에 이어 닷넷으로 여러 시도를 해보고 결국 ASP.NET CORE에 BLAZOR, RAZOR 등의 힙한 기술까지 손을 대보고 말지만 너무 실망하고 typescript 기반 express, react 등의 서버, 웹 프론트 프레임워크를 사용하고 도커와 caddy 등의 컨테이너 기반의 체계화된 프로젝트를 짜보는 등, 정말 **사람다운** 프레임워크로 웹 특히 서버를 공부했다.
 
+회사에서 게임 개발하는거 외에도 유니티로 자그마한 재밌는 것들도 몇가지 만들긴 했다.
+유니티 sprite 9-slice 같은 [mesh 27-slice](https://www.youtube.com/watch?v=PgSg7U1UVt0)도 만들었고, [matt stark의 polaroid game](https://youtu.be/ran_yU65Xmg) 영상에 나온 알고리즘도 [직접 만들어보았다](https://www.youtube.com/watch?v=RTmpTyq5qwk). (영상 짱신기하니까 봐주세욤) 그리고 좀 징그럽지만 맘에드는 [procedural IK leg](https://www.youtube.com/watch?v=Ag0G2FutVUY)도 만들어보았다. IK 구현하는데 수식이랑 싸웠던 기억이 아직도 생생하다
+
 외에는 정말 별게 없더라. 블로그에 글도 올렸던 [아희썬](https://github.com/20chan/aheuithon)과 실험적 플젝 .net core runtime method hijacking [hijacs](https://github.com/20chan/hijacs)은 정말 자그마한 플젝들이고, 참신한 시도로는 WFC 알고리즘을 적당히 응용한 영단어 생성 프로그램 [calimolite](https://github.com/20chan/calimolite) 정도가 있겠다.
-ㅌ
+
 그리고 최근에 블로그에 글도 올린 [메일 서비스를 연 경험](https://blog.0chan.dev/2020-06-16-Opening-Mail-Server/)정도
 
 외에는 서버 관리나 서버에 여러가지 삽질을 한거, 라즈베리파이와 여러 iot 하드웨어 도전 등이 있지만 자랑할만한 무언가가 나오지는 못했고, 이런 자잘한거 말고는 딱히 없다.
