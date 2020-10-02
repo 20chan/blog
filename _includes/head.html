@@ -52,6 +52,11 @@
   {% endif %}
 
   <link rel="stylesheet" href="//0ch.me/resources/fonts/iosevka-ss04/webfont.css" />
+  {% if layout.head-js %}
+  {% for js in layout.head-js %}
+	<script src="{{ js | prepend: site.baseurl | replace: '//', '/' }}"></script>
+  {% endfor %}
+{% endif %}
 
     <!-- Facebook OpenGraph tags -->
   {% if site.fb_app_id %}
