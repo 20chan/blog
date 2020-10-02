@@ -641,7 +641,7 @@ table tr td :last-child {
 
 /* --- Code blocks --- */
 code {
-  font-family: 'Iosevka SS04 Web', 'Monaco', 'Consolas', monospace;
+  font-family: 'Iosevka SS04 Web', 'Nanum Gothic Coding', monospace;
 }
 pre {
   font-size: 16px;
