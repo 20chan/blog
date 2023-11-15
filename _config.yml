@@ -17,7 +17,7 @@ baseurl: ""
 title: 영찬 블로그
 
 # Short description of your site
-description: 삽질한거 나만 보기 아까워서 올림
+description: 삽질 기록
 
 # --- Navigation bar options --- #
 
@@ -48,14 +48,14 @@ avatar: "/img/avatar-icon.jpg"
 author:
   name: 20chan
   email: "2@0chan.dev"
-  facebook: ars103  # eg. daattali
+  facebook:  # eg. daattali
   github: 20chan    # eg. daattali
   twitter:   # eg. daattali
   reddit:   # eg. daattali
   google-plus:    # eg. +DeanAttali or 109424658772469020925
-  linkedin: 영찬-이-3727b6121 # eg. daattali
+  linkedin: # eg. daattali
   xing:       # eg. daattali
-  stackoverflow: 5906697/phillyai  # eg. "3943160/daattali"
+  stackoverflow: 5906697/20chan  # eg. "3943160/daattali"
   snapchat:   # eg. daattali
   instagram:  # eg. daattali
   youtube:    # eg. user/daattali or channel/daattali
