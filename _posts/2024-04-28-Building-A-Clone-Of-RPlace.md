@@ -242,3 +242,5 @@ ctx.putImageData(imageData, 0, 0);
 [https://place.0ch.me](https://place.0ch.me/)
 
 물론 오픈소스다. [깃헙 리포](https://github.com/20chan/place)
+
+![qr](/img/place-qr.png)
