@@ -240,3 +240,5 @@ ctx.putImageData(imageData, 0, 0);
 어차피 쓸 사람은 없겠지만 그래도 관심이 있는 사람이 있다면 들어와서 깨작깨작해주면 굉장히 기쁠 것 같다.
 
 [https://place.0ch.me](https://place.0ch.me/)
+
+물론 오픈소스다. [깃헙 리포](https://github.com/20chan/place)
