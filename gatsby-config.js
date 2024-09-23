@@ -53,6 +53,14 @@ module.exports = {
               wrapperStyle: `margin-bottom: 1.0725rem`,
             },
           },
+          {
+            resolve: `gatsby-remark-autolink-headers`,
+            options: {
+              offsetY: `400`,
+              className: `autolink-header-icon`,
+              isIconAfterHeader: true,
+            },
+          },
           `gatsby-remark-prismjs`,
           {
             resolve: `gatsby-remark-copy-linked-files`,
@@ -60,7 +68,7 @@ module.exports = {
               destinationDir: `static`,
               ignoreFileExtensions: [`png`, `jpg`, `jpeg`, `bmp`, `tiff`],
             },
-          }
+          },
         ],
       },
     },

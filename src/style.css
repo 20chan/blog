@@ -156,6 +156,14 @@ hr {
   margin-bottom: var(--spacing-8);
 }
 
+.autolink-header-icon {
+  fill: var(--color-text) !important;
+}
+
+.autolink-header-icon:hover {
+  fill: var(--color-primary) !important;
+}
+
 /* Media queries */
 
 @media (max-width: 42rem) {
