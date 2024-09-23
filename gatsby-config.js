@@ -9,19 +9,20 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `영찬 블로그`,
     author: {
-      name: `Kyle Mathews`,
-      summary: `who lives and works in San Francisco building useful things.`,
+      name: `@20chan`,
     },
-    description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
+    description: `그동안의 테크 노트`,
+    siteUrl: `https://blog.0chan.dev`,
     social: {
-      twitter: `kylemathews`,
+      github: `20chan`,
+      email: `2@0chan.dev`,
     },
   },
   plugins: [
     `gatsby-plugin-image`,
+    `gatsby-plugin-postcss`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {

@@ -12,7 +12,6 @@ const BlogIndex = ({ data, location }) => {
   if (posts.length === 0) {
     return (
       <Layout location={location} title={siteTitle}>
-        <Bio />
         <p>
           No blog posts found. Add markdown posts to "content/blog" (or the
           directory you specified for the "gatsby-source-filesystem" plugin in
@@ -24,39 +23,43 @@ const BlogIndex = ({ data, location }) => {
 
   return (
     <Layout location={location} title={siteTitle}>
-      <Bio />
-      <ol style={{ listStyle: `none` }}>
-        {posts.map(post => {
-          const title = post.frontmatter.title || post.fields.slug
+      <table>
+        <tbody>
+          {posts.map(post => {
+            const title = post.frontmatter.title || post.fields.slug
 
-          return (
-            <li key={post.fields.slug}>
+            return (
               <article
-                className="post-list-item"
                 itemScope
                 itemType="http://schema.org/Article"
+                key={post.fields.slug}
               >
-                <header>
-                  <h2>
+                <tr>
+                  <td className='pr-4 text-[color:--color-text-light]'>
+                    {post.frontmatter.date}
+                  </td>
+                  <td className='group'>
                     <Link to={post.fields.slug} itemProp="url">
-                      <span itemProp="headline">{title}</span>
+                      <header>
+                        <span itemProp="headline" className='text-xl'>{title}</span>
+                      </header>
+                      <section>
+                        <p
+                          dangerouslySetInnerHTML={{
+                            __html: post.frontmatter.description || post.excerpt,
+                          }}
+                          itemProp="description"
+                          className='mb-4'
+                        />
+                      </section>
                     </Link>
-                  </h2>
-                  <small>{post.frontmatter.date}</small>
-                </header>
-                <section>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: post.frontmatter.description || post.excerpt,
-                    }}
-                    itemProp="description"
-                  />
-                </section>
+                  </td>
+                </tr>
               </article>
-            </li>
-          )
-        })}
-      </ol>
+            )
+          })}
+        </tbody>
+      </table>
     </Layout>
   )
 }
@@ -79,12 +82,11 @@ export const pageQuery = graphql`
     }
     allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
       nodes {
-        excerpt
         fields {
           slug
         }
         frontmatter {
-          date(formatString: "MMMM DD, YYYY")
+          date(formatString: "YYYY-MM-DD")
           title
           description
         }

@@ -25,9 +25,9 @@ const BlogPostTemplate = ({
         <section
           dangerouslySetInnerHTML={{ __html: post.html }}
           itemProp="articleBody"
+          className='markdown'
         />
-        <hr />
-        <footer>
+        <footer className='border-t-2 border-t-black pt-2 pb-4'>
           <Bio />
         </footer>
       </article>
@@ -89,7 +89,7 @@ export const pageQuery = graphql`
       html
       frontmatter {
         title
-        date(formatString: "MMMM DD, YYYY")
+        date(formatString: "YYYY-MM-DD")
         description
       }
     }
