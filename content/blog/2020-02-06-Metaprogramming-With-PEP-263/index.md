@@ -1,7 +1,7 @@
 ---
 title: Metaprogramming With PEP-263
 date: 2020-02-06
-description: 파이썬으로 이런 것도 가능하다
+description: 파이썬 커스텀 인코더로 DSL 구동
 ---
 
 최근 굉장히 재밌는 걸 보고 삘이 꽂혀서 열심히 삽질해본 게 있다.

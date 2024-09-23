@@ -1,7 +1,7 @@
 ---
 title: Generic rules
 date: 2019-02-18
-description: 제너릭이 짱이다
+description: 제너릭으로 박싱/언박싱 문제 해결
 ---
 
 재밌는 글을 찾았다.

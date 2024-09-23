@@ -1,7 +1,7 @@
 ---
 title: Array Or Object Creation
 date: 2018-01-27
-description: 너는 알지도 모르지만 나는 몰랐던 C# 개체 및 컬렉션 이니셜라이저
+description: C# 개체 및 컬렉션 이니셜라이저의 신태틱 슈거
 ---
 
 ![WTF](./array.png)

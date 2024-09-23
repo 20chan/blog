@@ -1,7 +1,7 @@
 ---
 title: .net 커스텀 JIT 컴파일러
 date: 2022-03-06
-description: c# 머신 코드 주무르기
+description: 런타임 JIT 후킹으로 IL 코드 몽키패칭
 ---
 
 3년전에 따라하다 싶이 만들었던 [프로토타입 프로젝트](https://github.com/20chan/CoreCLRCustomJIT)가 있었다. 오랜만에 보니 이렇게 재밌는걸 썩혀둘 수가 없어서 그럴싸하게 만들어보기로 했다.

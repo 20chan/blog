@@ -5,8 +5,11 @@ const Layout = ({ location, title, children }) => {
   const rootPath = `${__PATH_PREFIX__}/`
   const isRootPath = location.pathname === rootPath
   const header = (
-    <h1 className="font-bold text-4xl border-b-2 border-black pb-4">
-      <Link to="/">{title}</Link>
+    <h1 className="flex items-end font-bold text-4xl border-b-2 border-black">
+      <Link to="/" className='pb-4'>{title}</Link>
+
+      <div className='flex-1' />
+      <Link to="/about" className='text-2xl pb-4'>About</Link>
     </h1>
   )
 

@@ -1,7 +1,7 @@
 ---
 title: Arch on Surface Book 2 - 4
 date: 2020-04-02
-description: 350만원짜리 리눅스랩탑 만들기
+description: 350만원짜리 리눅스 랩탑 만들기 - 사용성 개선
 ---
 
 이번에는 진작 하고 싶었는데 미뤄뒀던 일들과 불편한 버그들을 해결했다.

@@ -58,6 +58,21 @@
   --color-heading: #1a202c;
   --color-heading-black: black;
   --color-accent: #d1dce5;
+  --color-background: white;
+  --color-background-accent: #f5f2f0;
+}
+
+@media(prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #4299e1;
+    --color-text: #d1dce5;
+    --color-text-light: #a0aec0;
+    --color-heading: #d1dce5;
+    --color-heading-black: white;
+    --color-accent: #2e353f;
+    --color-background: #2e353f;
+    --color-background-accent: #4a5568;
+  }
 }
 
 /* HTML elements */
@@ -73,6 +88,7 @@ html {
   font-size: var(--fontSize-root);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
 }
 
 body {

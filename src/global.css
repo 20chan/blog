@@ -99,7 +99,7 @@ ol {
 ul li,
 ol li {
   padding-left: var(--spacing-0);
-  margin-bottom: calc(var(--spacing-8) / 2);
+  margin-bottom: calc(var(--spacing-2) / 2);
 }
 
 li > p {
@@ -117,7 +117,7 @@ li > ul {
 
 blockquote {
   color: var(--color-text-light);
-  margin-left: calc(-1 * var(--spacing-6));
+  margin-left: 0;
   margin-right: var(--spacing-8);
   padding: var(--spacing-0) var(--spacing-0) var(--spacing-0) var(--spacing-6);
   border-left: var(--spacing-1) solid var(--color-primary);
@@ -164,4 +164,24 @@ a:focus {
 
 .markdown a:hover {
   text-decoration: underline;
+}
+
+/* code monkey patching */
+code .token.operator {
+  background: inherit;
+}
+
+pre[class*="language-"] {
+  background: none;
+  border-left: 0.25rem solid var(--color-text);
+  text-shadow: 0 1px var(--color-background);
+}
+
+code[class*="language-"], pre[class*="language-"] {
+  text-shadow: 0 1px var(--color-background);
+  color: var(--color-text);
+}
+
+:not(pre) > code[class*="language-"] {
+  background: var(--color-background-accent);
 }

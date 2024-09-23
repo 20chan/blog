@@ -1,7 +1,7 @@
 ---
 title: Arch on Surface Book 2 - 2
 date: 2020-03-22
-description: 350만원짜리 리눅스랩탑 만들기
+description: 350만원짜리 리눅스 랩탑 만들기 - DE
 ---
 
 사람들이 그렇게 좋아하는 Wayland를 한번 써보고 싶었지만 서피스 리눅스에서는 [문제](https://github.com/jakeday/linux-surface/issues/389)가 좀 있는것 같아서 익숙한 X Window를 선택했다.
