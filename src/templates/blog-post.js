@@ -28,7 +28,7 @@ const BlogPostTemplate = ({
           itemProp="articleBody"
           className='markdown'
         />
-        <footer className='border-t-2 border-t-black pt-2 pb-4'>
+        <footer className='border-t-2 border-[color:--color-text] pt-2 pb-4'>
           <Bio />
         </footer>
       </article>
