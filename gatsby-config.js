@@ -33,13 +33,6 @@ module.exports = {
     {
       resolve: `gatsby-source-filesystem`,
       options: {
-        path: `${__dirname}/content/lite`,
-        name: `lite`,
-      },
-    },
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
         name: `images`,
         path: `${__dirname}/src/images`,
       },
@@ -143,6 +136,16 @@ module.exports = {
         display: `minimal-ui`,
         icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
       },
+    },
+    {
+      resolve: `gatsby-plugin-umami`,
+      options: {
+        websiteId: `0a2f8992-3ba9-45d8-940e-cfa3a160e8d7`,
+        srcUrl: `https://umami.0ch.me/script.js`,
+        includeInDevelopment: false,
+        autoTrack: true,
+        respectDoNotTrack: false,
+      }
     },
   ],
 }
