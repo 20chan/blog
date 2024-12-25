@@ -107,12 +107,12 @@ li > p {
 }
 
 li *:last-child {
-  margin-bottom: var(--spacing-0);
+  margin-bottom: calc(var(--spacing-8) / 4);
 }
 
 li > ul {
-  margin-left: var(--spacing-8);
-  margin-top: calc(var(--spacing-8) / 2);
+  margin-left: var(--spacing-6);
+  margin-top: calc(var(--spacing-8) / 8);
 }
 
 blockquote {
